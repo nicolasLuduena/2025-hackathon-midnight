@@ -5,6 +5,10 @@ import App from "./App.tsx";
 import { ContractProvider } from "./contexts/contract.tsx";
 import pino from "pino";
 import { WalletProvider } from "./hooks/useWallet.tsx";
+import {
+  setNetworkId,
+  NetworkId,
+} from "@midnight-ntwrk/midnight-js-network-id";
 
 const logger = pino.pino({ level: "debug" });
 
@@ -18,3 +22,5 @@ createRoot(document.getElementById("root")!).render(
     ,
   </StrictMode>,
 );
+const networkId = import.meta.env.VITE_NETWORK_ID as NetworkId;
+setNetworkId(networkId);
