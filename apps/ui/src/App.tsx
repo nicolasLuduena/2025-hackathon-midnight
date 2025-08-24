@@ -1,11 +1,9 @@
-import { Shield, TrendingUp, Users, Lock, Eye } from "lucide-react";
+import { Shield, TrendingUp, Users, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AssetOverview } from "@/components/asset-overview";
 import { TradingInterface } from "@/components/trading-interface";
-import { PrivacyIndicator } from "@/components/privacy-indicator";
 
 export default function ZKTradingDashboard() {
   return (
@@ -20,15 +18,14 @@ export default function ZKTradingDashboard() {
               </div>
               <div>
                 <h1 className="text-xl font-serif font-bold text-foreground">
-                  ZK Assets
+                  Oz Tokens
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Privacy-First Trading
+                  Tokenization Trading
                 </p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <PrivacyIndicator />
               <Button variant="outline" size="sm">
                 <Lock className="w-4 h-4 mr-2" />
                 Connect Wallet
@@ -38,10 +35,8 @@ export default function ZKTradingDashboard() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="grid gap-8">
-          {/* Asset Overview Section */}
           <section>
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -52,20 +47,11 @@ export default function ZKTradingDashboard() {
                   Monitor your tokenized assets and market activity
                 </p>
               </div>
-              <Badge
-                variant="secondary"
-                className="bg-accent/10 text-accent-foreground"
-              >
-                <Eye className="w-3 h-3 mr-1" />
-                Privacy Mode: ON
-              </Badge>
             </div>
             <AssetOverview />
           </section>
-
           <Separator />
 
-          {/* Trading Interface */}
           <section>
             <div className="mb-6">
               <h2 className="text-2xl font-serif font-bold text-foreground mb-2">
@@ -78,8 +64,7 @@ export default function ZKTradingDashboard() {
             <TradingInterface />
           </section>
 
-          {/* Quick Stats */}
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -105,20 +90,6 @@ export default function ZKTradingDashboard() {
                 <div className="text-2xl font-bold">1,234</div>
                 <p className="text-xs text-muted-foreground">
                   Across 5 different assets
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Privacy Score
-                </CardTitle>
-                <Shield className="h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-primary">100%</div>
-                <p className="text-xs text-muted-foreground">
-                  Zero-knowledge verified
                 </p>
               </CardContent>
             </Card>
