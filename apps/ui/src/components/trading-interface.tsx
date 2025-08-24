@@ -1,18 +1,35 @@
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { ShoppingCart, Coins, Shield, AlertCircle, CheckCircle } from "lucide-react"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  ShoppingCart,
+  Coins,
+  Shield,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 
 export function TradingInterface() {
-  const [selectedAsset, setSelectedAsset] = useState("")
-  const [amount, setAmount] = useState("")
-  const [price, setPrice] = useState("")
+  const [selectedAsset, setSelectedAsset] = useState("");
+  const [amount, setAmount] = useState("");
 
   return (
     <div className="grid lg:grid-cols-2 gap-8">
@@ -33,19 +50,27 @@ export function TradingInterface() {
                   Mint New Shares
                 </CardTitle>
                 <CardDescription>
-                  Purchase shares directly from the asset pool with zero-knowledge privacy
+                  Purchase shares directly from the asset pool with
+                  zero-knowledge privacy
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="mint-asset">Select Asset</Label>
-                  <Select value={selectedAsset} onValueChange={setSelectedAsset}>
+                  <Select
+                    value={selectedAsset}
+                    onValueChange={setSelectedAsset}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Choose an asset to mint" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="reta">Real Estate Token A (RETA)</SelectItem>
-                      <SelectItem value="artb">Art Collection B (ARTB)</SelectItem>
+                      <SelectItem value="reta">
+                        Real Estate Token A (RETA)
+                      </SelectItem>
+                      <SelectItem value="artb">
+                        Art Collection B (ARTB)
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -62,13 +87,20 @@ export function TradingInterface() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="mint-total">Total Cost</Label>
-                    <Input id="mint-total" placeholder="$12,550" readOnly className="bg-muted" />
+                    <Input
+                      id="mint-total"
+                      placeholder="$12,550"
+                      readOnly
+                      className="bg-muted"
+                    />
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
                   <Shield className="w-4 h-4 text-primary" />
-                  <span className="text-sm text-primary">Zero-knowledge proof will be generated</span>
+                  <span className="text-sm text-primary">
+                    Zero-knowledge proof will be generated
+                  </span>
                 </div>
 
                 <Button className="w-full" size="lg">
@@ -86,7 +118,9 @@ export function TradingInterface() {
                   <Coins className="w-5 h-5 mr-2" />
                   Create Sell Offer
                 </CardTitle>
-                <CardDescription>List your shares for sale with privacy-preserving nullifiers</CardDescription>
+                <CardDescription>
+                  List your shares for sale with privacy-preserving nullifiers
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -96,8 +130,12 @@ export function TradingInterface() {
                       <SelectValue placeholder="Select shares to sell" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="reta-owned">RETA - 250 shares owned</SelectItem>
-                      <SelectItem value="artb-owned">ARTB - 100 shares owned</SelectItem>
+                      <SelectItem value="reta-owned">
+                        RETA - 250 shares owned
+                      </SelectItem>
+                      <SelectItem value="artb-owned">
+                        ARTB - 100 shares owned
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -115,7 +153,9 @@ export function TradingInterface() {
 
                 <div className="flex items-center space-x-2 p-3 bg-accent/5 rounded-lg border border-accent/20">
                   <AlertCircle className="w-4 h-4 text-accent" />
-                  <span className="text-sm text-accent">Your identity will remain private via nullifiers</span>
+                  <span className="text-sm text-accent">
+                    Your identity will remain private via nullifiers
+                  </span>
                 </div>
 
                 <Button className="w-full" size="lg" variant="secondary">
@@ -132,7 +172,9 @@ export function TradingInterface() {
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   Buy from Offers
                 </CardTitle>
-                <CardDescription>Purchase shares from existing private offers</CardDescription>
+                <CardDescription>
+                  Purchase shares from existing private offers
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -142,7 +184,9 @@ export function TradingInterface() {
                       <div className="flex justify-between items-center">
                         <div>
                           <p className="font-medium">RETA - 100 shares</p>
-                          <p className="text-sm text-muted-foreground">Anonymous Seller</p>
+                          <p className="text-sm text-muted-foreground">
+                            Anonymous Seller
+                          </p>
                         </div>
                         <div className="text-right">
                           <p className="font-bold">$125.00/share</p>
@@ -157,7 +201,9 @@ export function TradingInterface() {
                       <div className="flex justify-between items-center">
                         <div>
                           <p className="font-medium">ARTB - 25 shares</p>
-                          <p className="text-sm text-muted-foreground">Anonymous Seller</p>
+                          <p className="text-sm text-muted-foreground">
+                            Anonymous Seller
+                          </p>
                         </div>
                         <div className="text-right">
                           <p className="font-bold">$89.00/share</p>
@@ -178,7 +224,12 @@ export function TradingInterface() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="buy-total">Total Cost</Label>
-                    <Input id="buy-total" placeholder="$3,125" readOnly className="bg-muted" />
+                    <Input
+                      id="buy-total"
+                      placeholder="$3,125"
+                      readOnly
+                      className="bg-muted"
+                    />
                   </div>
                 </div>
 
@@ -267,12 +318,12 @@ export function TradingInterface() {
             </div>
             <Separator />
             <p className="text-xs text-muted-foreground">
-              All transactions are cryptographically private. Your identity and transaction details remain confidential
-              on the blockchain.
+              All transactions are cryptographically private. Your identity and
+              transaction details remain confidential on the blockchain.
             </p>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }

@@ -19,9 +19,15 @@
  * @packageDocumentation
  */
 
-import contractModule, { AssetPublicInfo, Offer } from 'contract-primitives';
-import { CoinInfo, QualifiedCoinInfo } from 'contract-primitives';
-const { Contract, ledger, pureCircuits } = contractModule;
+import {
+  CoinInfo,
+  QualifiedCoinInfo,
+  Contract,
+  ledger,
+  pureCircuits,
+  AssetPublicInfo,
+  Offer,
+} from 'contract-primitives';
 
 import { type ContractAddress, encodeTokenType } from '@midnight-ntwrk/compact-runtime';
 import { type Logger } from 'pino';
