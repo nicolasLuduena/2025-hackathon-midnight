@@ -39,7 +39,6 @@ import {
   contractPrivateStateKey,
   uint8ArrayToString,
 } from './common-types.js';
-// import { Contract, ledger, pureCircuits, STATE } from '../../contract/src/managed/bboard/contract/index.cjs';
 import {
   type ContractPrivateState,
   createContractPrivateState,
@@ -73,12 +72,12 @@ export interface DeployedContractAPI {
 }
 
 /**
- * Provides an implementation of {@link DeployedBBoardAPI} by adapting a deployed bulletin board
+ * Provides an implementation of {@link DeployedAPI} by adapting a deployed bulletin board
  * contract.
  *
  * @remarks
- * The `BBoardPrivateState` is managed at the DApp level by a private state provider. As such, this
- * private state is shared between all instances of {@link BBoardAPI}, and their underlying deployed
+ * The `PrivateState` is managed at the DApp level by a private state provider. As such, this
+ * private state is shared between all instances of {@link API}, and their underlying deployed
  * contracts. The private state defines a `'secretKey'` property that effectively identifies the current
  * user, and is used to determine if the current user is the poster of the message as the observable
  * contract state changes.
@@ -88,7 +87,6 @@ export interface DeployedContractAPI {
  * the deployed bulletin board contracts, and allows for a unique secret key to be generated for each bulletin
  * board that the user interacts with.
  */
-// TODO: Update BBoardAPI to use contract level private state storage.
 export class ContractAPI implements DeployedContractAPI {
   /**
    * Gets the address of the current deployed contract.
@@ -213,8 +211,8 @@ export class ContractAPI implements DeployedContractAPI {
    *
    * @param providers The bulletin board providers.
    * @param logger An optional 'pino' logger to use for logging.
-   * @returns A `Promise` that resolves with a {@link BBoardAPI} instance that manages the newly deployed
-   * {@link DeployedBBoardContract}; or rejects with a deployment error.
+   * @returns A `Promise` that resolves with a {@link ContractAPI} instance that manages the newly deployed
+   * {@link DeployedContract}; or rejects with a deployment error.
    */
   static async deploy(providers: ContractProviders, logger?: Logger): Promise<ContractAPI> {
     logger?.info('deployContract');
@@ -252,8 +250,8 @@ export class ContractAPI implements DeployedContractAPI {
    * @param providers The bulletin board providers.
    * @param contractAddress The contract address of the deployed bulletin board contract to search for and join.
    * @param logger An optional 'pino' logger to use for logging.
-   * @returns A `Promise` that resolves with a {@link BBoardAPI} instance that manages the joined
-   * {@link DeployedBBoardContract}; or rejects with an error.
+   * @returns A `Promise` that resolves with a {@link ContractAPI} instance that manages the joined
+   * {@link DeployedContract}; or rejects with an error.
    */
   static async join(
     providers: ContractProviders,
@@ -266,7 +264,7 @@ export class ContractAPI implements DeployedContractAPI {
       },
     });
 
-    const deployedBBoardContract = await findDeployedContract<ContractContract>(providers, {
+    const deployedContract = await findDeployedContract<ContractContract>(providers, {
       contractAddress,
       contract: contractContractInstance,
       privateStateId: contractPrivateStateKey,
@@ -275,11 +273,11 @@ export class ContractAPI implements DeployedContractAPI {
 
     logger?.trace({
       contractJoined: {
-        finalizedDeployTxData: deployedBBoardContract.deployTxData.public,
+        finalizedDeployTxData: deployedContract.deployTxData.public,
       },
     });
 
-    return new ContractAPI(deployedBBoardContract, providers, logger);
+    return new ContractAPI(deployedContract, providers, logger);
   }
 
   private static async getPrivateState(providers: ContractProviders): Promise<ContractPrivateState> {

@@ -51,9 +51,9 @@ export type PrivateStateId = typeof contractPrivateStateKey;
  */
 export type PrivateStates = {
   /**
-   * Key used to provide the private state for {@link BBoardContract} deployments.
+   * Key used to provide the private state for {@link Contract} deployments.
    */
-  readonly bboardPrivateState: ContractPrivateState;
+  readonly contractPrivateState: ContractPrivateState;
 };
 
 /**
@@ -64,21 +64,21 @@ export type PrivateStates = {
 export type ContractContract = Contract<ContractPrivateState, Witnesses<ContractPrivateState>>;
 
 /**
- * The keys of the circuits exported from {@link BBoardContract}.
+ * The keys of the circuits exported from {@link Contract}.
  *
  * @public
  */
 export type ContractCircuitKeys = Exclude<keyof ContractContract['impureCircuits'], number | symbol>;
 
 /**
- * The providers required by {@link BBoardContract}.
+ * The providers required by {@link Contract}.
  *
  * @public
  */
 export type ContractProviders = MidnightProviders<ContractCircuitKeys, PrivateStateId, ContractPrivateState>;
 
 /**
- * A {@link BBoardContract} that has been deployed to the network.
+ * A {@link Contract} that has been deployed to the network.
  *
  * @public
  */
