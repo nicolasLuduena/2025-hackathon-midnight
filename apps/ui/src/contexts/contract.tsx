@@ -6,30 +6,29 @@ import {
 import { type Logger } from "pino";
 
 /**
- * Encapsulates a deployed boards provider as a context object.
+ * Encapsulates a deployed contract provider as a context object.
  */
-export const DeployedBoardContext = createContext<
+export const ContractContext = createContext<
   DeployedBoardAPIProvider | undefined
 >(undefined);
 
 /**
- * The props required by the {@link DeployedBoardProvider} component.
+ * The props required by the {@link ContractProvider} component.
  */
-export type DeployedBoardProviderProps = PropsWithChildren<{
+export type ContractProviderProps = PropsWithChildren<{
   /** The `pino` logger to use. */
   logger: Logger;
 }>;
 
 /**
- * A React component that sets a new {@link BrowserDeployedBoardManager} object as the currently
- * in-scope deployed board provider.
+ * A React component that sets a new {@link BrowserContractManager} object as the currently
+ * in-scope deployed contract provider.
  */
-export const DeployedBoardProvider: React.FC<
-  Readonly<DeployedBoardProviderProps>
-> = ({ logger, children }) => (
-  <DeployedBoardContext.Provider
-    value={new BrowserDeployedBoardManager(logger)}
-  >
+export const ContractProvider: React.FC<Readonly<ContractProviderProps>> = ({
+  logger,
+  children,
+}) => (
+  <ContractContext.Provider value={new BrowserDeployedBoardManager(logger)}>
     {children}
-  </DeployedBoardContext.Provider>
+  </ContractContext.Provider>
 );
