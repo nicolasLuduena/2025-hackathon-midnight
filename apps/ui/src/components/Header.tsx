@@ -8,15 +8,15 @@ export default function Header() {
     useWallet();
 
   return (
-    <header className="fixed top-0 w-full border-b border-gray-300 bg-transparent backdrop-blur-sm">
-      <div className="flex justify-between items-center w-full h-16 px-3">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm shadow-sm">
+      <div className="flex justify-between items-center w-full h-16 px-3 max-w-7xl mx-auto">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-white-300">Midnight DApp</h1>
+          <h1 className="text-xl font-bold text-foreground">Midnight DApp</h1>
         </div>
 
         <div className="flex items-center gap-4">
           {error && (
-            <div className="text-red-500 text-sm p-2 border border-red-300 rounded bg-red-50">
+            <div className="text-destructive text-sm p-2 border border-destructive/20 rounded bg-destructive/10">
               {error}
             </div>
           )}
