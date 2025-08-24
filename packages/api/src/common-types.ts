@@ -21,10 +21,17 @@
 
 import { type MidnightProviders } from '@midnight-ntwrk/midnight-js-types';
 import { type FoundContract } from '@midnight-ntwrk/midnight-js-contracts';
-import type { State, BBoardPrivateState, Contract, Witnesses } from '../../contract/src/index';
+import type {
+  ContractPrivateState,
+  Contract,
+  Witnesses,
+  AssetPublicInfo,
+  QualifiedCoinInfo,
+  Offer,
+} from 'contract-primitives';
 
-export const bboardPrivateStateKey = 'bboardPrivateState';
-export type PrivateStateId = typeof bboardPrivateStateKey;
+export const contractPrivateStateKey = 'contractPrivateState';
+export type PrivateStateId = typeof contractPrivateStateKey;
 
 /**
  * The private states consumed throughout the application.
@@ -46,7 +53,7 @@ export type PrivateStates = {
   /**
    * Key used to provide the private state for {@link BBoardContract} deployments.
    */
-  readonly bboardPrivateState: BBoardPrivateState;
+  readonly bboardPrivateState: ContractPrivateState;
 };
 
 /**
@@ -54,46 +61,109 @@ export type PrivateStates = {
  *
  * @public
  */
-export type BBoardContract = Contract<BBoardPrivateState, Witnesses<BBoardPrivateState>>;
+export type ContractContract = Contract<ContractPrivateState, Witnesses<ContractPrivateState>>;
 
 /**
  * The keys of the circuits exported from {@link BBoardContract}.
  *
  * @public
  */
-export type BBoardCircuitKeys = Exclude<keyof BBoardContract['impureCircuits'], number | symbol>;
+export type ContractCircuitKeys = Exclude<keyof ContractContract['impureCircuits'], number | symbol>;
 
 /**
  * The providers required by {@link BBoardContract}.
  *
  * @public
  */
-export type BBoardProviders = MidnightProviders<BBoardCircuitKeys, PrivateStateId, BBoardPrivateState>;
+export type ContractProviders = MidnightProviders<ContractCircuitKeys, PrivateStateId, ContractPrivateState>;
 
 /**
  * A {@link BBoardContract} that has been deployed to the network.
  *
  * @public
  */
-export type DeployedBBoardContract = FoundContract<BBoardContract>;
+export type DeployedContractContract = FoundContract<ContractContract>;
 
-/**
- * A type that represents the derived combination of public (or ledger), and private state.
- */
-export type BBoardDerivedState = {
-  readonly state: State;
-  readonly sequence: bigint;
-  readonly message: string | undefined;
-
-  /**
-   * A readonly flag that determines if the current message was posted by the current user.
-   *
-   * @remarks
-   * The `owner` property of the public (or ledger) state is the public key of the message owner, while
-   * the `secretKey` property of {@link BBoardPrivateState} is the secret key of the current user. If
-   * `owner` corresponds to the public key derived from `secretKey`, then `isOwner` is `true`.
-   */
-  readonly isOwner: boolean;
+export type DerivedProtocolTotal = {
+  id: string;
+  treasury: {
+    nonce: Uint8Array;
+    color: Uint8Array;
+    value: bigint;
+    mt_index: bigint;
+  };
 };
 
-// TODO: for some reason I needed to include "@midnight-ntwrk/wallet-sdk-address-format": "1.0.0-rc.1", should we bump in to rc-2 ?
+export type ContractDerivedState = {
+  readonly assetInfo: AssetPublicInfo;
+  readonly expectedCoinType: string;
+  readonly unitPrice: bigint;
+  readonly availableShares: bigint;
+  readonly sells: Map<Offer, QualifiedCoinInfo>;
+  readonly claimables: Map<Offer, QualifiedCoinInfo>;
+};
+
+export function parseTreasury(treasury: {
+  isEmpty(): boolean;
+  size(): bigint;
+  member(key_0: Uint8Array): boolean;
+  lookup(key_0: Uint8Array): QualifiedCoinInfo;
+  [Symbol.iterator](): Iterator<[Uint8Array, QualifiedCoinInfo]>;
+}): DerivedProtocolTotal[] {
+  return Array.from(treasury).map(([key, bal]) => ({
+    id: uint8ArrayToString(key),
+    treasury: Object.fromEntries(
+      Object.entries(bal).map(([k, v]) => {
+        if (k === 'nonce' || k === 'color') {
+          return [k, uint8ArrayToString(v as Uint8Array)];
+        }
+        return [k, v];
+      }),
+    ),
+  }));
+}
+
+//// HELPERS
+
+export function uint8ArrayToString(array: Uint8Array): string {
+  // Debug logging
+  console.log(
+    'Converting array:',
+    Array.from(array)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join(''),
+  );
+  console.log('Array length:', array.length);
+
+  if (array.length < 16) {
+    throw new Error(`Array too short for UUID conversion: ${array.length} bytes`);
+  }
+
+  // Take first 16 bytes and check if they contain actual data
+  const uuidBytes = array.slice(0, 16);
+
+  // Check if all bytes are zero (invalid UUID)
+  if (uuidBytes.every((byte) => byte === 0)) {
+    // Instead of throwing, return a default or handle gracefully
+    console.warn('Received all-zero UUID bytes, this might indicate uninitialized data');
+    return '00000000-0000-0000-0000-000000000000'; // Return null UUID
+    // Or throw with more context:
+    // throw new Error(`Invalid UUID: all bytes are zero. Full array: ${Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('')}`);
+  }
+
+  const hex = Array.from(uuidBytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+
+  const formatted = [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20, 32)].join(
+    '-',
+  );
+
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(formatted)) {
+    throw new Error(`Invalid UUID format: ${formatted}`);
+  }
+
+  return formatted;
+}

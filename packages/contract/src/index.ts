@@ -14,4 +14,4 @@
 // limitations under the License.
 
 export * from "./managed/tokenization/contract/index.cjs";
-export * from "./witnesses";
+export * from "./witnesses.js";

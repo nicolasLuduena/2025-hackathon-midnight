@@ -105,6 +105,9 @@ importers:
       '@midnight-ntwrk/compact-runtime':
         specifier: ^0.8.1
         version: 0.8.1
+      '@midnight-ntwrk/ledger':
+        specifier: ^4.0.0
+        version: 4.0.0
       '@midnight-ntwrk/midnight-js-contracts':
         specifier: ^2.0.2
         version: 2.0.2
@@ -528,6 +531,9 @@ packages:
 
   '@midnight-ntwrk/dapp-connector-api@3.0.0':
     resolution: {integrity: sha512-A/AhsNjibrOSaUiPhQhxANeW9178uYnzeBFBf30YCvyvWg0YWCbhQfc7dRpiL7iBoX3Sxt9mtf+Svx4ZygLajg==}
+
+  '@midnight-ntwrk/ledger@4.0.0':
+    resolution: {integrity: sha512-cnJisY8uQ4NO54miDnjs/ov6n102ZPfKEPxtiDKVEdlKijcc70jz/CI2yBCc0itlwwaqma7FM2Ou5N4pWpbwbg==}
 
   '@midnight-ntwrk/midnight-js-contracts@2.0.2':
     resolution: {integrity: sha512-L1MPw5cmMq4bA5MQrnq9SWMl2wfmwOS2oK+lLwvtiYGtvd1/JrIXxBZk1759Sf9xTtVxmMdDS4yFLd3US0en2A==}
@@ -2598,6 +2604,8 @@ snapshots:
       ts-custom-error: 3.3.1
     transitivePeerDependencies:
       - rxjs
+
+  '@midnight-ntwrk/ledger@4.0.0': {}
 
   '@midnight-ntwrk/midnight-js-contracts@2.0.2':
     dependencies:

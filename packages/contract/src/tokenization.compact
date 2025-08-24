@@ -1,4 +1,3 @@
-
 // This file is part of midnightntwrk/example-counter.
 // Copyright (C) 2025 Midnight Foundation
 // SPDX-License-Identifier: Apache-2.0
@@ -17,9 +16,10 @@ pragma language_version >= 0.16;
 import CompactStandardLibrary;
 import "./oz-contracts/src/access/Ownable" prefix Ownable_;
 import "./oz-contracts/src/token/ShieldedToken" prefix Shielded_;
-export { CoinInfo, QualifiedCoinInfo, ZswapCoinPublicKey, AssetPublicInfo };
+export { CoinInfo, QualifiedCoinInfo, ZswapCoinPublicKey, AssetPublicInfo, Offer };
 
 witness secret_key(): Bytes<32>;
+witness salt(): Bytes<32>;
 
 struct AssetPublicInfo {
   kind: Opaque<"string">;
@@ -49,8 +49,13 @@ ledger accumulated: Map<Bytes<32>, QualifiedCoinInfo>;
 export ledger availableShares: Uint<32>;
 
 // Tabla de ofertas
-export ledger sells: Map<Bytes<32>, QualifiedCoinInfo>;
-export ledger claimables: Map<Bytes<32>, QualifiedCoinInfo>;
+struct Offer {
+  nullifiedOwner: Bytes<32>;
+  shares: Uint<32>;
+  pricePerShare: Uint<32>;
+}
+export ledger sells: Map<Offer, QualifiedCoinInfo>;
+export ledger claimables: Map<Offer, QualifiedCoinInfo>;
 
 ledger domain_sep: Bytes<32>;
 
@@ -78,22 +83,78 @@ export circuit mintShare(amountOfShares: Uint<32>, coin: CoinInfo): [] {
   assert(coin.value == amountOfShares * unitPrice, "Wrong amount sent");
   receive(disclosedCoin);
 
-  const coinToInsert = accumulated.member(disclosedCoin.color) ?
-    mergeCoinImmediate(accumulated.lookup(disclosedCoin.color), disclosedCoin) :
-    disclosedCoin;
-
-  const own = left<ZswapCoinPublicKey, ContractAddress>(disclose(ownPublicKey()));
-  mintToken(disclose(domain_sep), disclosedShares as Uint<64>, disclose(domain_sep), own);
+  // const coinToInsert = accumulated.member(disclosedCoin.color) ?
+  //   mergeCoinImmediate(accumulated.lookup(disclosedCoin.color), disclosedCoin) :
+  //   disclosedCoin;
   // accumulated.insertCoin(
   //   disclosedCoin.color,
   //   coinToInsert,
   //   right<ZswapCoinPublicKey, ContractAddress>(kernel.self())
   // );
 
+  const own = left<ZswapCoinPublicKey, ContractAddress>(disclose(ownPublicKey()));
+  mintToken(disclose(domain_sep), disclosedShares as Uint<64>, disclose(domain_sep), own);
+  availableShares = availableShares - disclosedShares;
+  return;
+}
+
+export circuit sellShares(amountOfShares: Uint<32>, unitPrice: Uint<32>, tokens: CoinInfo): [] {
+  const disclosedShares = disclose(amountOfShares);
+  const disclosedCoin = disclose(tokens);
+  assert(disclosedCoin.color == expectedCoinType, "Not the right asset provided");
+  assert(disclosedShares > 0, "Must sell at least one share");
+  receive(disclosedCoin);
+
+
+  const thisCoinKey = Offer {
+    nullifiedOwner: disclose(nullify(secret_key(), salt())),
+    shares: disclosedShares,
+    pricePerShare: disclose(unitPrice),
+  };
+  // const existingSell = sells.member(thisCoinKey) ?
+  //   mergeCoinImmediate(sells.lookup(thisCoinKey), disclosedCoin) :
+  //   disclosedCoin;
+
+  // sells.insertCoin(
+  //   thisCoinKey,
+  //   existingSell,
+  //   right<ZswapCoinPublicKey, ContractAddress>(kernel.self())
+  // );
+
+  return;
+}
+
+export circuit buyShare(nullifiedOwner: Bytes<32>, amountOfShares: Uint<32>, unitPrice: Uint<32>, coin: CoinInfo): [] {
+  const disclosedShares = disclose(amountOfShares);
+  const disclosedCoin = disclose(coin);
+  assert(disclosedShares > 0, "Must buy at least one share");
+  assert(disclosedCoin.color == expectedCoinType, "Not the right asset provided");
+  receive(disclosedCoin);
+
+  const thisCoinKey = Offer {
+    nullifiedOwner: disclose(nullifiedOwner),
+    shares: disclosedShares,
+    pricePerShare: disclose(unitPrice),
+  };
+  const offerExists = sells.member(thisCoinKey);
+  assert(offerExists, "No such offer");
+  const offer = sells.lookup(thisCoinKey);
+  const totalAmount = disclosedShares * disclose(unitPrice);
+  send(offer, left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()), totalAmount);
+
+  // sells.remove(thisCoinKey);
+  // claimables.insertCoin(
+  //   thisCoinKey,
+  //   disclosedCoin,
+  //   right<ZswapCoinPublicKey, ContractAddress>(kernel.self())
+  // );
   return;
 }
 
 export circuit publicKey(sk: Bytes<32>): Bytes<32> {
-  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "bboard:pk:"), sk]);
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "pk"), sk]);
 }
 
+circuit nullify(sk: Bytes<32>, salt: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<3, Bytes<32>>>([pad(32, "pk:"), sk, salt]);
+}

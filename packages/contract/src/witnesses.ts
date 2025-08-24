@@ -21,22 +21,20 @@
 import { Ledger } from "./managed/tokenization/contract/index.cjs";
 import { WitnessContext } from "@midnight-ntwrk/compact-runtime";
 
-/* **********************************************************************
- * The only hidden state needed by the bulletin board contract is
- * the user's secret key.  Some of the library code and
- * compiler-generated code is parameterized by the type of our
- * private state, so we define a type for it and a function to
- * make an object of that type.
- */
-
-export type BBoardPrivateState = {
-  readonly secretKey: Uint8Array;
+export type ContractPrivateState = {
+  readonly secret_key: Uint8Array;
+  readonly salt: Uint8Array;
 };
 
-export const createBBoardPrivateState = (secretKey: Uint8Array) => ({
-  secretKey,
-});
-
+export const createContractPrivateState = (
+  secretKey: Uint8Array,
+  salt: Uint8Array,
+) => {
+  return {
+    secret_key: secretKey,
+    salt,
+  };
+};
 /* **********************************************************************
  * The witnesses object for the bulletin board contract is an object
  * with a field for each witness function, mapping the name of the function
@@ -64,11 +62,26 @@ export const createBBoardPrivateState = (secretKey: Uint8Array) => ({
  * from the WitnessContext, so it uses the parameter notation that puts
  * only the binding for the privateState in scope.
  */
+// export const witnesses = {
+//   localSecretKey: ({
+//     privateState,
+//   }: WitnessContext<Ledger, BBoardPrivateState>): [
+//     BBoardPrivateState,
+//     Uint8Array,
+//   ] => [privateState, privateState.secretKey],
+// };
+
 export const witnesses = {
-  localSecretKey: ({
+  secret_key: ({
     privateState,
-  }: WitnessContext<Ledger, BBoardPrivateState>): [
-      BBoardPrivateState,
+  }: WitnessContext<Ledger, ContractPrivateState>): [
+      ContractPrivateState,
       Uint8Array,
-    ] => [privateState, privateState.secretKey],
+    ] => [privateState, privateState.secret_key],
+  salt: ({
+    privateState,
+  }: WitnessContext<Ledger, ContractPrivateState>): [
+      ContractPrivateState,
+      Uint8Array,
+    ] => [privateState, privateState.salt],
 };
