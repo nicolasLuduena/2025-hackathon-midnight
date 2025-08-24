@@ -20,6 +20,9 @@ importers:
 
   apps/ui:
     dependencies:
+      '@midnight-ntwrk/dapp-connector-api':
+        specifier: ^3.0.0
+        version: 3.0.0(rxjs@7.8.2)
       '@radix-ui/react-slot':
         specifier: ^1.2.3
         version: 1.2.3(@types/react@19.1.11)(react@19.1.1)
@@ -523,6 +526,9 @@ packages:
   '@midnight-ntwrk/compact-runtime@0.8.1':
     resolution: {integrity: sha512-ZXG/iprEqTCxQC/P1oETGOR5CnsoemPsfb17eSANPRsm+11AcIOP0Tp8KJipN+GbycgxOA+fAVwLFqA1hDCgbw==}
 
+  '@midnight-ntwrk/dapp-connector-api@3.0.0':
+    resolution: {integrity: sha512-A/AhsNjibrOSaUiPhQhxANeW9178uYnzeBFBf30YCvyvWg0YWCbhQfc7dRpiL7iBoX3Sxt9mtf+Svx4ZygLajg==}
+
   '@midnight-ntwrk/midnight-js-contracts@2.0.2':
     resolution: {integrity: sha512-L1MPw5cmMq4bA5MQrnq9SWMl2wfmwOS2oK+lLwvtiYGtvd1/JrIXxBZk1759Sf9xTtVxmMdDS4yFLd3US0en2A==}
 
@@ -537,6 +543,14 @@ packages:
 
   '@midnight-ntwrk/onchain-runtime@0.3.0':
     resolution: {integrity: sha512-vZWPoz7MhXO5UgWZET50g7APOcT5dbAfADDcrSreeOagV8lj7JJzlnYIIhrcUaMOv+NHWxPaUcJUYUkmu9LoTA==}
+
+  '@midnight-ntwrk/wallet-api@5.0.0':
+    resolution: {integrity: sha512-L5Z9+v+ouqTtPLoXpngtBVHZ0SmC3zLrCZbuYnd/ul6p9UbwUQ3AQeqMhclv2jhwFRNYsL0fBOqpD5dvs4SvLQ==}
+    peerDependencies:
+      rxjs: 7.x
+
+  '@midnight-ntwrk/zswap@4.0.0':
+    resolution: {integrity: sha512-yKfzp4M/wUkqxUJv1D2SizojYdWYnF3FDeKaxPehLPOFC4BrR9KnLZsNR2Y/occ8a4yFDtQXf7bN1QvK5k7Grw==}
 
   '@next/eslint-plugin-next@15.5.0':
     resolution: {integrity: sha512-+k83U/fST66eQBjTltX2T9qUYd43ntAe+NZ5qeZVTQyTiFiHvTLtkpLKug4AnZAtuI/lwz5tl/4QDJymjVkybg==}
@@ -2081,6 +2095,10 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
+  ts-custom-error@3.3.1:
+    resolution: {integrity: sha512-5OX1tzOjxWEgsr/YEUWSuPrQ00deKLh6D7OTWcvNHm12/7QPyRh8SYpyWvA4IZv8H/+GQWQEh/kwo95Q9OVW1A==}
+    engines: {node: '>=14.0.0'}
+
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
@@ -2573,6 +2591,14 @@ snapshots:
       '@types/object-inspect': 1.13.0
       object-inspect: 1.13.4
 
+  '@midnight-ntwrk/dapp-connector-api@3.0.0(rxjs@7.8.2)':
+    dependencies:
+      '@midnight-ntwrk/wallet-api': 5.0.0(rxjs@7.8.2)
+      '@midnight-ntwrk/zswap': 4.0.0
+      ts-custom-error: 3.3.1
+    transitivePeerDependencies:
+      - rxjs
+
   '@midnight-ntwrk/midnight-js-contracts@2.0.2':
     dependencies:
       '@midnight-ntwrk/midnight-js-network-id': 2.0.2
@@ -2588,6 +2614,13 @@ snapshots:
   '@midnight-ntwrk/midnight-js-utils@2.0.2': {}
 
   '@midnight-ntwrk/onchain-runtime@0.3.0': {}
+
+  '@midnight-ntwrk/wallet-api@5.0.0(rxjs@7.8.2)':
+    dependencies:
+      '@midnight-ntwrk/zswap': 4.0.0
+      rxjs: 7.8.2
+
+  '@midnight-ntwrk/zswap@4.0.0': {}
 
   '@next/eslint-plugin-next@15.5.0':
     dependencies:
@@ -4378,6 +4411,8 @@ snapshots:
   ts-api-utils@2.1.0(typescript@5.9.2):
     dependencies:
       typescript: 5.9.2
+
+  ts-custom-error@3.3.1: {}
 
   tslib@2.8.1: {}
 
