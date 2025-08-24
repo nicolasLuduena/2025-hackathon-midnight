@@ -1,0 +1,43 @@
+{
+  "name": "contract-primitives",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./managed": "./dist/managed",
+    "./managed/*": "./dist/managed/*",
+    "./managed/bboard/contract": {
+      "types": "./dist/managed/bboard/contract/index.d.cts",
+      "require": "./dist/managed/bboard/contract/index.cjs"
+    },
+    "./managed/bboard/compiler/*": "./dist/managed/bboard/compiler/*",
+    "./managed/bboard/keys/*": "./dist/managed/bboard/keys/*",
+    "./managed/bboard/zkir/*": "./dist/managed/bboard/zkir/*"
+  },
+  "scripts": {
+    "build": "rm -rf dist && pnpm run compact && tsc --project tsconfig.build.json && cp -r ./src/managed ./dist/managed && cp ./src/bboard.compact ./dist",
+    "compact": "compact compile src/bboard.compact ./src/managed/bboard",
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.29.0",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "eslint": "^9.25.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.5.1",
+    "globals": "^16.2.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.0"
+  },
+  "dependencies": {
+    "@midnight-ntwrk/compact-runtime": "^0.8.1"
+  }
+}
