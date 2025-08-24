@@ -244,7 +244,7 @@ const initializeProviders = async (
 
   return {
     privateStateProvider: levelPrivateStateProvider({
-      privateStateStoreName: "contract-private-state",
+      privateStateStoreName: "bboard-private-state",
     }),
     zkConfigProvider: new FetchZkConfigProvider<ContractCircuitKeys>(
       zkConfigPath,
