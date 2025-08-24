@@ -1,5 +1,4 @@
-"use client";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useContractContext } from "@/hooks/useDeployedContract";
 
 interface AssetPublicInfo {
   kind: string;
@@ -40,6 +40,7 @@ export function CreateContractDialog({
   children,
   onCreateContract,
 }: CreateContractDialogProps) {
+  const contractApiProvider = useContractContext();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<CreateContractFormData>({
     assetInfo: {
@@ -50,6 +51,11 @@ export function CreateContractDialog({
     unitPrice: "",
     availableShares: "",
   });
+
+  const onCreate = useCallback(
+    () => contractApiProvider.resolve(),
+    [contractApiProvider],
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,7 +186,12 @@ export function CreateContractDialog({
             >
               Cancel
             </Button>
-            <Button className="cursor-pointer" variant="default" type="submit">
+            <Button
+              className="cursor-pointer"
+              variant="default"
+              type="submit"
+              onClick={onCreate}
+            >
               Create Contract
             </Button>
           </DialogFooter>

@@ -10,7 +10,6 @@ import { useCallback, useEffect, useState } from "react";
 import type { Observable } from "rxjs";
 import type { ContractDeployment } from "./contexts/browser-contract-manager";
 import { Button } from "./components/ui/button";
-import { getNetworkId } from "@midnight-ntwrk/midnight-js-network-id";
 
 export default function ZKTradingDashboard() {
   const boardApiProvider = useContractContext();
@@ -18,7 +17,6 @@ export default function ZKTradingDashboard() {
     Array<Observable<ContractDeployment>>
   >([]);
 
-  console.log("NETWOKR ID", getNetworkId());
   useEffect(() => {
     const subscription =
       boardApiProvider.boardDeployments$.subscribe(setBoardDeployments);
@@ -27,11 +25,6 @@ export default function ZKTradingDashboard() {
       subscription.unsubscribe();
     };
   }, [boardApiProvider]);
-  const onCreateBoard = useCallback(
-    () => boardApiProvider.resolve(),
-    [boardApiProvider],
-  );
-
   console.log(boardDeployments);
 
   return (
@@ -40,7 +33,6 @@ export default function ZKTradingDashboard() {
       <main className="container mx-auto px-4 py-8 pt-24">
         <div className="grid gap-8">
           <section>
-            <Button onClick={onCreateBoard}>HOLAAA</Button>
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-serif font-bold text-foreground">
