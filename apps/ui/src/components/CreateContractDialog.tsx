@@ -174,8 +174,8 @@ export function CreateContractDialog({
           <DialogFooter>
             <Button
               type="button"
-              variant="outline"
-              className="cursor-pointer"
+              variant="default"
+              className="bg-transparent border border-border text-foreground hover:bg-red-600 hover:text-white cursor-pointer"
               onClick={() => setOpen(false)}
             >
               Cancel

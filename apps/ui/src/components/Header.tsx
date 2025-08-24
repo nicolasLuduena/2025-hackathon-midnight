@@ -73,8 +73,8 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      variant="outline"
-                      className="flex items-center gap-2"
+                      variant="default"
+                      className="bg-transparent border border-border text-foreground hover:bg-white hover:text-black cursor-pointer"
                     >
                       <User className="w-4 h-4" />
                       <span className="text-sm">
@@ -89,7 +89,7 @@ export default function Header() {
                     <DropdownMenuLabel>Wallet Info</DropdownMenuLabel>
                     <DropdownMenuItem
                       onClick={disconnect}
-                      className="text-red-600 focus:text-red-600 cursor-pointer"
+                      className="text-red-600 focus:text-red-600 hover:bg-gray-800 focus:bg-gray-800 cursor-pointer"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
                       Disconnect
