@@ -85,7 +85,6 @@ constructor(
   _coinType: Bytes<32>,
   _unitPrice: Uint<32>,
   _availableShares: Uint<32>,
-  _domain_sep: Bytes<32>
 ) {
   Ownable_initialize(disclose(left<ZswapCoinPublicKey, ContractAddress>(_owner)));
   assetInfo = disclose(_assetInfo);
@@ -229,4 +228,3 @@ export circuit publicKey(sk: Bytes<32>): Bytes<32> {
 export circuit nullify(sk: Bytes<32>, salt: Bytes<32>): Bytes<32> {
   return persistentHash<Vector<3, Bytes<32>>>([pad(32, "pk"), sk, salt]);
 }
-
