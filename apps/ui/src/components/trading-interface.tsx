@@ -18,7 +18,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   ShoppingCart,
   Coins,
@@ -30,10 +29,8 @@ import {
 export function TradingInterface() {
   const [selectedAsset, setSelectedAsset] = useState("");
   const [amount, setAmount] = useState("");
-
   return (
     <div className="grid lg:grid-cols-2 gap-8">
-      {/* Trading Forms */}
       <div>
         <Tabs defaultValue="mint" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
@@ -243,7 +240,6 @@ export function TradingInterface() {
         </Tabs>
       </div>
 
-      {/* Transaction History & Privacy Info */}
       <div className="space-y-6">
         <Card>
           <CardHeader>
@@ -284,43 +280,6 @@ export function TradingInterface() {
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Shield className="w-5 h-5 mr-2 text-primary" />
-              Privacy Features
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Zero-Knowledge Proofs</span>
-              <Badge variant="secondary" className="bg-primary/10 text-primary">
-                <CheckCircle className="w-3 h-3 mr-1" />
-                Active
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Nullifier Protection</span>
-              <Badge variant="secondary" className="bg-primary/10 text-primary">
-                <CheckCircle className="w-3 h-3 mr-1" />
-                Enabled
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Identity Shielding</span>
-              <Badge variant="secondary" className="bg-primary/10 text-primary">
-                <CheckCircle className="w-3 h-3 mr-1" />
-                Protected
-              </Badge>
-            </div>
-            <Separator />
-            <p className="text-xs text-muted-foreground">
-              All transactions are cryptographically private. Your identity and
-              transaction details remain confidential on the blockchain.
-            </p>
           </CardContent>
         </Card>
       </div>
