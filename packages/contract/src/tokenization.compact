@@ -1,63 +1,83 @@
-// This file is part of midnightntwrk/example-counter.
-// Copyright (C) 2025 Midnight Foundation
-// SPDX-License-Identifier: Apache-2.0
-// Licensed under the Apache License, Version 2.0 (the "License");
-// You may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 pragma language_version >= 0.16;
 import CompactStandardLibrary;
 import "./oz-contracts/src/access/Ownable" prefix Ownable_;
 import "./oz-contracts/src/token/ShieldedToken" prefix Shielded_;
 export { CoinInfo, QualifiedCoinInfo, ZswapCoinPublicKey, AssetPublicInfo, Offer };
 
+/*
+    ========================
+    TOKENIZED ASSET CONTRACT
+    ========================
+    This contract allows to tokenize an asset (e.g. real estate, land, art, etc) into shares that can be
+    bought and sold anonymously. Shares are represented as shielded native tokens, which can be minted and transferred
+    to ZSwap or other Contract addresses.
+
+    The contract owner initializes the contract with the asset information, the expected coin type
+    to be used to buy shares, the unit price per share, and the number of available shares.
+    Users can then mint shares by sending the appropriate amount of coins to the contract, and
+    receive the corresponding number of shares.
+
+    Share owners can sell their shares by creating an offer. The share tokens are stored in the contract until
+    a buyer accepts the offer. The buyer can then buy the shares by paying the requested amount by the seller.
+    The seller can later claim the payment for the sold shares, or reclaim the shares if the offer is not accepted.
+
+    The contract uses a nullifier mechanism to allow sellers to create offers without revealing their
+    public key. The nullifier is a salted hash of the seller's private key, which is used to identify the offer.
+    The seller can later claim back the tokens if the offer is not sold, by proving they know the secret key and salt used to create the nullifier.
+*/
+
+
+///////////////////
+// PRIVATE STATE //
+///////////////////
+
+/*
+ *  - Witnesses
+ *  Used in combination the user can create different salted hashes of their private key,
+ *  that acts as nullifier. This serve two purposes:
+ *  1. Upon token sale, the seller can create an offer by setting a nullifier, and a buyer
+ *     can buy the token without knowing the seller's public key.
+ *  2. If the offer is not sold, the seller can later claim back the tokens by proving they know
+ *     the secret key and salt used to create the nullifier.
+ */
 witness secret_key(): Bytes<32>;
 witness salt(): Bytes<32>;
 
+
+// Accumulates the coins received when minting shares. This is private state and not publicly visible.
+ledger accumulated: Map<Bytes<32>, QualifiedCoinInfo>;
+
+//////////////////
+// PUBLIC STATE //
+//////////////////
 struct AssetPublicInfo {
   kind: Opaque<"string">;
   description: Opaque<"string">;
 }
 
-struct AssetPrivateInfo {
-  uri: Opaque<"string">;
-}
-
-struct Tokenization {
-  asset: AssetMetadata;
-}
-
-export ledger assetInfo: AssetPublicInfo;
-
-// FIJO
-export ledger expectedCoinType: Bytes<32>;
-
-// ACTUALIZABLE POR ADMIN
-export ledger unitPrice: Uint<32>;
-
-// acumula lo vendido en minted shares
-ledger accumulated: Map<Bytes<32>, QualifiedCoinInfo>;
-
-// se resta cuando se mintea un token
-export ledger availableShares: Uint<32>;
-
-// Tabla de ofertas
 struct Offer {
   nullifiedOwner: Bytes<32>;
   shares: Uint<32>;
   pricePerShare: Uint<32>;
 }
+
+/*
+ * The public state of the contract is composed of:
+ *   - The tokenized asset information, like asset kind (land, real estate, etc) and description.
+ *   - The expected coin type to be used to buy shares of the asset.
+ *   - The unit price per share.
+ *   - The number of available mintable shares to be bought anonymously by users.
+ *   - The shares currently being sold anonimously by sellers.
+ *   - The payments for sold shares that can be claimed by the sellers.
+ */
+export ledger assetInfo: AssetPublicInfo;
+export ledger expectedCoinType: Bytes<32>;
+export ledger unitPrice: Uint<32>;
+export ledger availableShares: Uint<32>;
 export ledger sells: Map<Offer, QualifiedCoinInfo>;
 export ledger claimables: Map<Offer, QualifiedCoinInfo>;
 
-ledger domain_sep: Bytes<32>;
+
 
 constructor(
   _owner: ZswapCoinPublicKey,
@@ -72,9 +92,10 @@ constructor(
   unitPrice = disclose(_unitPrice);
   availableShares = disclose(_availableShares);
   expectedCoinType = disclose(_coinType);
-  domain_sep = disclose(_domain_sep);
 }
 
+// Mint shares by sending the appropriate amount of coins to the contract.
+// The minted tokens are sent to the caller's public key.
 export circuit mintShare(amountOfShares: Uint<32>, coin: CoinInfo): [] {
   const disclosedCoin = disclose(coin);
   const disclosedShares = disclose(amountOfShares);
@@ -83,6 +104,15 @@ export circuit mintShare(amountOfShares: Uint<32>, coin: CoinInfo): [] {
   assert(coin.value == amountOfShares * unitPrice, "Wrong amount sent");
   receive(disclosedCoin);
 
+
+  /*
+   * KNOWN ISSUE:
+   * There is a current issue with keeping track of Native assets in a contract ledger.
+   * The transaction building goes well, but the proof server throws an error when trying to
+   * prove the transaction.
+   * Due to the merkle tree index in the QualifiedCoinInfo structure, there is currently no other way to keep
+   * track of Native coins in a contract ledger.
+   */
   // const coinToInsert = accumulated.member(disclosedCoin.color) ?
   //   mergeCoinImmediate(accumulated.lookup(disclosedCoin.color), disclosedCoin) :
   //   disclosedCoin;
@@ -93,11 +123,14 @@ export circuit mintShare(amountOfShares: Uint<32>, coin: CoinInfo): [] {
   // );
 
   const own = left<ZswapCoinPublicKey, ContractAddress>(disclose(ownPublicKey()));
-  mintToken(disclose(domain_sep), disclosedShares as Uint<64>, disclose(domain_sep), own);
+  Shielded_mint(own, disclosedShares as Uint<64>);
   availableShares = availableShares - disclosedShares;
   return;
 }
 
+
+// Create an offer to sell shares by sending the share tokens.
+// Tokens are stored in the contract until a buyer accepts the offer.
 export circuit sellShares(amountOfShares: Uint<32>, unitPrice: Uint<32>, tokens: CoinInfo): [] {
   const disclosedShares = disclose(amountOfShares);
   const disclosedCoin = disclose(tokens);
@@ -111,6 +144,16 @@ export circuit sellShares(amountOfShares: Uint<32>, unitPrice: Uint<32>, tokens:
     shares: disclosedShares,
     pricePerShare: disclose(unitPrice),
   };
+
+  /*
+   * KNOWN ISSUE:
+   * There is a current issue with keeping track of Native assets in a contract ledger.
+   * The transaction building goes well, but the proof server throws an error when trying to
+   * prove the transaction.
+   * Due to the merkle tree index in the QualifiedCoinInfo structure, there is currently no other way to keep
+   * track of Native coins in a contract ledger.
+   */
+
   // const existingSell = sells.member(thisCoinKey) ?
   //   mergeCoinImmediate(sells.lookup(thisCoinKey), disclosedCoin) :
   //   disclosedCoin;
@@ -124,6 +167,9 @@ export circuit sellShares(amountOfShares: Uint<32>, unitPrice: Uint<32>, tokens:
   return;
 }
 
+// Buy shares by accepting an existing offer.
+// The payment is sent to the seller's public key, and the share tokens are stored in the contract
+// until the seller claims the payment.
 export circuit buyShare(nullifiedOwner: Bytes<32>, amountOfShares: Uint<32>, unitPrice: Uint<32>, coin: CoinInfo): [] {
   const disclosedShares = disclose(amountOfShares);
   const disclosedCoin = disclose(coin);
@@ -136,25 +182,51 @@ export circuit buyShare(nullifiedOwner: Bytes<32>, amountOfShares: Uint<32>, uni
     shares: disclosedShares,
     pricePerShare: disclose(unitPrice),
   };
-  const offerExists = sells.member(thisCoinKey);
-  assert(offerExists, "No such offer");
-  const offer = sells.lookup(thisCoinKey);
-  const totalAmount = disclosedShares * disclose(unitPrice);
-  send(offer, left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()), totalAmount);
+    const offerExists = sells.member(thisCoinKey);
+    assert(offerExists, "No such offer");
+    const offer = sells.lookup(thisCoinKey);
+    const totalAmount = disclosedShares * disclose(unitPrice);
+    send(offer, left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()), totalAmount);
 
-  // sells.remove(thisCoinKey);
-  // claimables.insertCoin(
-  //   thisCoinKey,
-  //   disclosedCoin,
-  //   right<ZswapCoinPublicKey, ContractAddress>(kernel.self())
-  // );
+    sells.remove(thisCoinKey);
+    claimables.insertCoin(
+      thisCoinKey,
+      disclosedCoin,
+      right<ZswapCoinPublicKey, ContractAddress>(kernel.self())
+    );
   return;
+}
+
+// Claim the payment for sold shares, or reclaim the shares if the offer is not accepted.
+export circuit claimBackOrPayment(owner: Bytes<32>, amountOfShares: Uint<32>, unitPrice: Uint<32>): [] {
+  const disclosedShares = disclose(amountOfShares);
+  const thisCoinKey = Offer {
+    nullifiedOwner: disclose(nullify(secret_key(), salt())),
+    shares: disclosedShares,
+    pricePerShare: disclose(unitPrice),
+  };
+  const offerInSells = sells.member(thisCoinKey);
+  const offerInClaimables = claimables.member(thisCoinKey);
+  const offerExists = offerInSells || offerInClaimables;
+  assert(offerExists, "Nothing to claim");
+  if (offerInClaimables) {
+    const claimable = claimables.lookup(thisCoinKey);
+    send(claimable, left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()), claimable.value);
+    claimables.remove(thisCoinKey);
+    return;
+  } else {
+    const sellable = sells.lookup(thisCoinKey);
+    send(sellable, left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()), sellable.value);
+    sells.remove(thisCoinKey);
+    return;
+  }
 }
 
 export circuit publicKey(sk: Bytes<32>): Bytes<32> {
   return persistentHash<Vector<2, Bytes<32>>>([pad(32, "pk"), sk]);
 }
 
-circuit nullify(sk: Bytes<32>, salt: Bytes<32>): Bytes<32> {
-  return persistentHash<Vector<3, Bytes<32>>>([pad(32, "pk:"), sk, salt]);
+export circuit nullify(sk: Bytes<32>, salt: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<3, Bytes<32>>>([pad(32, "pk"), sk, salt]);
 }
+
