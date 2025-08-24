@@ -101,7 +101,7 @@ export function TradingInterface() {
                 </div>
 
                 <Button className="w-full" size="lg">
-                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  <ShoppingCart className="w-4 h-4 mr-2 cursor-pointer" />
                   Mint Shares
                 </Button>
               </CardContent>

@@ -17,9 +17,8 @@ export function AssetOverview() {
       symbol: "RETA",
       totalShares: 10000,
       availableShares: 2500,
-      unitPrice: 125.5,
-      totalValue: 1255000,
-      priceChange: 2.5,
+      unitPrice: 125,
+      totalValue: 125500,
       lastUpdated: "2 hours ago",
     },
     {
@@ -28,9 +27,8 @@ export function AssetOverview() {
       symbol: "ARTB",
       totalShares: 5000,
       availableShares: 750,
-      unitPrice: 89.25,
+      unitPrice: 89,
       totalValue: 446250,
-      priceChange: -1.2,
       lastUpdated: "1 hour ago",
     },
   ];
@@ -54,17 +52,13 @@ export function AssetOverview() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* Price and Change */}
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold">
-                  ${asset.unitPrice.toFixed(2)}
-                </p>
+                <p className="text-2xl font-bold">${asset.unitPrice}</p>
                 <p className="text-sm text-muted-foreground">per share</p>
               </div>
             </div>
 
-            {/* Share Availability */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Available Shares</span>
@@ -79,7 +73,6 @@ export function AssetOverview() {
               />
             </div>
 
-            {/* Asset Details */}
             <div className="grid grid-cols-2 gap-4 pt-4 border-t">
               <div>
                 <p className="text-sm text-muted-foreground">Total Value</p>
@@ -89,10 +82,12 @@ export function AssetOverview() {
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex gap-3 pt-4">
-              <Button className="flex-1">Buy Shares</Button>
-              <Button variant="outline" className="flex-1 bg-transparent">
+              <Button className="flex-1 cursor-pointer">Buy Shares</Button>
+              <Button
+                variant="default"
+                className="flex-1 bg-transparent border border-border text-foreground hover:bg-gray-900 focus:bg-gray-900 cursor-pointer"
+              >
                 Sell Shares
               </Button>
             </div>
