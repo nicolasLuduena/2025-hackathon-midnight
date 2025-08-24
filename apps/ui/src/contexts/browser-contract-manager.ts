@@ -49,28 +49,29 @@ import {
 } from "@midnight-ntwrk/midnight-js-network-id";
 
 /**
- * An in-progress bulletin board deployment.
+ * An in-progress contract deploy
  */
-export interface InProgressBoardDeployment {
+
+export interface InProgressContractDeployment {
   readonly status: "in-progress";
 }
 
 /**
- * A deployed bulletin board deployment.
+ * A deployed contract deployment.
  */
-export interface DeployedBoardDeployment {
+export interface DeployedContractDeployment {
   readonly status: "deployed";
 
   /**
-   * The {@link DeployedBBoardAPI} instance when connected to an on network bulletin board contract.
+   * The {@link ContractAPI} instance when connected to an on network contract.
    */
   readonly api: ContractAPI;
 }
 
 /**
- * A failed bulletin board deployment.
+ * A failed contract deployment.
  */
-export interface FailedBoardDeployment {
+export interface FailedContractDeployment {
   readonly status: "failed";
 
   /**
@@ -80,74 +81,74 @@ export interface FailedBoardDeployment {
 }
 
 /**
- * A bulletin board deployment.
+ * A contract deployment.
  */
-export type BoardDeployment =
-  | InProgressBoardDeployment
-  | DeployedBoardDeployment
-  | FailedBoardDeployment;
+export type ContractDeployment =
+  | InProgressContractDeployment
+  | DeployedContractDeployment
+  | FailedContractDeployment;
 
 /**
- * Provides access to bulletin board deployments.
+ * Provides access to contract deployments.
  */
-export interface DeployedBoardAPIProvider {
+export interface ContractAPIProvider {
   /**
-   * Gets the observable set of board deployments.
+   * Gets the observable set of contract deployments.
    *
    * @remarks
-   * This property represents an observable array of {@link BoardDeployment}, each also an
-   * observable. Changes to the array will be emitted as boards are resolved (deployed or joined),
-   * while changes to each underlying board can be observed via each item in the array.
+   * This property represents an observable array of {@link ContractDeployment}, each also an
+   * observable. Changes to the array will be emitted as contracts are resolved (deployed or joined),
+   * while changes to each underlying contract can be observed via each item in the array.
    */
-  readonly boardDeployments$: Observable<Array<Observable<BoardDeployment>>>;
+  readonly boardDeployments$: Observable<Array<Observable<ContractDeployment>>>;
 
   /**
-   * Joins or deploys a bulletin board contract.
+   * Joins or deploys a contract.
    *
    * @param contractAddress An optional contract address to use when resolving.
-   * @returns An observable board deployment.
+   * @returns An observable contract deployment.
    *
    * @remarks
-   * For a given `contractAddress`, the method will attempt to find and join the identified bulletin board
+   * For a given `contractAddress`, the method will attempt to find and join the identified contract
    * contract; otherwise it will attempt to deploy a new one.
    */
   readonly resolve: (
     contractAddress?: ContractAddress,
-  ) => Observable<BoardDeployment>;
+  ) => Observable<ContractDeployment>;
 }
 
 /**
- * A {@link DeployedBoardAPIProvider} that manages bulletin board deployments in a browser setting.
+ * A {@link ContractAPIProvider} that manages contract deployments in a browser setting.
  *
  * @remarks
- * {@link BrowserDeployedBoardManager} configures and manages a connection to the Midnight Lace
+ * {@link BrowserContractManager} configures and manages a connection to the Midnight Lace
  * wallet, along with a collection of additional providers that work in a web-browser setting.
  */
-export class BrowserDeployedBoardManager implements DeployedBoardAPIProvider {
+export class BrowserContractManager implements ContractAPIProvider {
   private readonly logger: Logger;
   readonly #boardDeploymentsSubject: BehaviorSubject<
-    Array<BehaviorSubject<BoardDeployment>>
+    Array<BehaviorSubject<ContractDeployment>>
   >;
   #initializedProviders: Promise<ContractProviders> | undefined;
 
   /**
-   * Initializes a new {@link BrowserDeployedBoardManager} instance.
+   * Initializes a new {@link BrowserContractManager} instance.
    *
    * @param logger The `pino` logger to for logging.
    */
   constructor(logger: Logger) {
     this.logger = logger;
     this.#boardDeploymentsSubject = new BehaviorSubject<
-      Array<BehaviorSubject<BoardDeployment>>
+      Array<BehaviorSubject<ContractDeployment>>
     >([]);
     this.boardDeployments$ = this.#boardDeploymentsSubject;
   }
 
   /** @inheritdoc */
-  readonly boardDeployments$: Observable<Array<Observable<BoardDeployment>>>;
+  readonly boardDeployments$: Observable<Array<Observable<ContractDeployment>>>;
 
   /** @inheritdoc */
-  resolve(contractAddress?: ContractAddress): Observable<BoardDeployment> {
+  resolve(contractAddress?: ContractAddress): Observable<ContractDeployment> {
     const deployments = this.#boardDeploymentsSubject.value;
     let deployment = deployments.find(
       (deployment) =>
@@ -159,7 +160,7 @@ export class BrowserDeployedBoardManager implements DeployedBoardAPIProvider {
       return deployment;
     }
 
-    deployment = new BehaviorSubject<BoardDeployment>({
+    deployment = new BehaviorSubject<ContractDeployment>({
       status: "in-progress",
     });
 
@@ -188,7 +189,7 @@ export class BrowserDeployedBoardManager implements DeployedBoardAPIProvider {
   }
 
   private async deployDeployment(
-    deployment: BehaviorSubject<BoardDeployment>,
+    deployment: BehaviorSubject<ContractDeployment>,
   ): Promise<void> {
     try {
       const providers = await this.getProviders();
@@ -207,7 +208,7 @@ export class BrowserDeployedBoardManager implements DeployedBoardAPIProvider {
   }
 
   private async joinDeployment(
-    deployment: BehaviorSubject<BoardDeployment>,
+    deployment: BehaviorSubject<ContractDeployment>,
     contractAddress: ContractAddress,
   ): Promise<void> {
     try {
@@ -243,7 +244,7 @@ const initializeProviders = async (
 
   return {
     privateStateProvider: levelPrivateStateProvider({
-      privateStateStoreName: "bboard-private-state",
+      privateStateStoreName: "contract-private-state",
     }),
     zkConfigProvider: new FetchZkConfigProvider<ContractCircuitKeys>(
       zkConfigPath,

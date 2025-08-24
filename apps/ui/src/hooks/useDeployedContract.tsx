@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { ContractContext } from "../contexts/contract";
-import { type DeployedBoardAPIProvider } from "../contexts/browser-contract-manager";
+import { type ContractAPIProvider } from "../contexts/browser-contract-manager";
 
 /**
  * Retrieves the currently in-scope deployed boards provider.
@@ -9,7 +9,7 @@ import { type DeployedBoardAPIProvider } from "../contexts/browser-contract-mana
  *
  * @internal
  */
-export const useContractContext = (): DeployedBoardAPIProvider => {
+export const useContractContext = (): ContractAPIProvider => {
   const context = useContext(ContractContext);
 
   if (!context) {

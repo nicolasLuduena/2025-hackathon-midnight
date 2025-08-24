@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "rm -rf ./dist && tsc && vite build --mode testnet && cp -r ../../packages/contract/src/managed/tokenization/keys ./dist/keys && cp -r ../../packages/contract/src/managed/tokenization/zkir ./dist/zkir",
     "start": "http-server --port 0 ./dist",
     "lint": "eslint .",
     "preview": "vite preview"

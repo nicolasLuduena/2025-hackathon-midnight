@@ -1,16 +1,16 @@
 import React, { type PropsWithChildren, createContext } from "react";
 import {
-  type DeployedBoardAPIProvider,
-  BrowserDeployedBoardManager,
+  type ContractAPIProvider,
+  BrowserContractManager,
 } from "./browser-contract-manager";
 import { type Logger } from "pino";
 
 /**
  * Encapsulates a deployed contract provider as a context object.
  */
-export const ContractContext = createContext<
-  DeployedBoardAPIProvider | undefined
->(undefined);
+export const ContractContext = createContext<ContractAPIProvider | undefined>(
+  undefined,
+);
 
 /**
  * The props required by the {@link ContractProvider} component.
@@ -28,7 +28,7 @@ export const ContractProvider: React.FC<Readonly<ContractProviderProps>> = ({
   logger,
   children,
 }) => (
-  <ContractContext.Provider value={new BrowserDeployedBoardManager(logger)}>
+  <ContractContext.Provider value={new BrowserContractManager(logger)}>
     {children}
   </ContractContext.Provider>
 );
