@@ -1,11 +1,29 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useWallet } from "@/hooks/useWallet";
-import { Loader2, Shield, Lock } from "lucide-react";
+import { Loader2, Shield, Lock, ChevronDown, User, LogOut } from "lucide-react";
+import { CreateContractDialog } from "./CreateContractDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Header() {
   const { connect, disconnect, isConnected, isConnecting, error, state } =
     useWallet();
+
+  const handleCreateContract = (data: {
+    assetInfo: { kind: string; description: string };
+    expectedCoinType: Uint8Array;
+    unitPrice: bigint;
+    availableShares: bigint;
+  }) => {
+    console.log("Creating contract with data:", data);
+    // TODO: Implement actual contract creation logic
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50 shadow-sm">
@@ -17,7 +35,7 @@ export default function Header() {
             </div>
             <div>
               <h1 className="text-xl font-serif font-bold text-foreground">
-                Oz Tokens
+                Oz Trades
               </h1>
               <p className="text-sm text-muted-foreground">
                 Tokenization Trading
@@ -52,19 +70,38 @@ export default function Header() {
               </Button>
             ) : (
               <div className="flex gap-4 items-center">
-                <span className="text-green-500 text-sm">
-                  ✓{" "}
-                  {state?.address
-                    ? `${state.address.slice(0, 6)}...${state.address.slice(-6)}`
-                    : "Connected"}
-                </span>
-                <Button
-                  variant="default"
-                  className="cursor-pointer transition-colors hover:bg-red-700 bg-red-600"
-                  onClick={disconnect}
-                >
-                  Disconnect
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <User className="w-4 h-4" />
+                      <span className="text-sm">
+                        {state?.address
+                          ? `${state.address.slice(0, 6)}...${state.address.slice(-6)}`
+                          : "Connected"}
+                      </span>
+                      <ChevronDown className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>Wallet Info</DropdownMenuLabel>
+                    <DropdownMenuItem
+                      onClick={disconnect}
+                      className="text-red-600 focus:text-red-600 cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Disconnect
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <CreateContractDialog onCreateContract={handleCreateContract}>
+                  <Button variant="default" className="cursor-pointer">
+                    Create Contract
+                  </Button>
+                </CreateContractDialog>
               </div>
             )}
           </div>
