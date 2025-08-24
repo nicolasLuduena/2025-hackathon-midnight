@@ -1,7 +1,9 @@
 import "./globals";
-import { TrendingUp, Users } from "lucide-react";
+import { TrendingUp, Users, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { AssetOverview } from "@/components/asset-overview";
 import { TradingInterface } from "@/components/trading-interface";
 import Header from "./components/Header";
@@ -9,7 +11,6 @@ import { useContractContext } from "./hooks/useDeployedContract";
 import { useCallback, useEffect, useState } from "react";
 import type { Observable } from "rxjs";
 import type { ContractDeployment } from "./contexts/browser-contract-manager";
-import { Button } from "./components/ui/button";
 //import { type ContractAddress } from "@midnight-ntwrk/compact-runtime";
 
 export default function ZKTradingDashboard() {
@@ -17,6 +18,7 @@ export default function ZKTradingDashboard() {
   const [boardDeployments, setBoardDeployments] = useState<
     Array<Observable<ContractDeployment>>
   >([]);
+  const [contractAddress, setContractAddress] = useState("");
 
   useEffect(() => {
     const subscription =
@@ -41,6 +43,11 @@ export default function ZKTradingDashboard() {
   //    boardApiProvider.resolve(contractAddress),
   //  [boardApiProvider],
   //);
+  const handleAddContract = () => {
+    // TODO: Implement add contract functionality
+    console.log("Adding contract with address:", contractAddress);
+    setContractAddress("");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -48,6 +55,34 @@ export default function ZKTradingDashboard() {
       <main className="container mx-auto px-4 py-8 pt-24">
         <div className="grid gap-8">
           <Button onClick={onCreateBoard}>HOLAAA</Button>
+          <section>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-serif font-semibold text-foreground">
+                  Add Contract
+                </h2>
+                <p className="text-muted-foreground text-sm">
+                  Enter a contract address to monitor
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2 max-w-md">
+              <Input
+                type="text"
+                placeholder="Enter contract address..."
+                value={contractAddress}
+                onChange={(e) => setContractAddress(e.target.value)}
+                className="flex-1"
+              />
+              <Button
+                onClick={handleAddContract}
+                disabled={!contractAddress.trim()}
+                className="px-3"
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+          </section>
           <section>
             <div className="flex items-center justify-between mb-6">
               <div>

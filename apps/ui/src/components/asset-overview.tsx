@@ -36,7 +36,7 @@ export function AssetOverview() {
   ];
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {mockAssets.map((asset) => (
         <Card key={asset.id} className="relative overflow-hidden">
           <CardHeader className="pb-4">
