@@ -13,17 +13,17 @@
     },
     "./managed": "./dist/managed",
     "./managed/*": "./dist/managed/*",
-    "./managed/bboard/contract": {
-      "types": "./dist/managed/bboard/contract/index.d.cts",
-      "require": "./dist/managed/bboard/contract/index.cjs"
+    "./managed/tokenization/contract": {
+      "types": "./dist/managed/tokenization/contract/index.d.cts",
+      "require": "./dist/managed/tokenization/contract/index.cjs"
     },
-    "./managed/bboard/compiler/*": "./dist/managed/bboard/compiler/*",
-    "./managed/bboard/keys/*": "./dist/managed/bboard/keys/*",
-    "./managed/bboard/zkir/*": "./dist/managed/bboard/zkir/*"
+    "./managed/tokenization/compiler/*": "./dist/managed/tokenization/compiler/*",
+    "./managed/tokenization/keys/*": "./dist/managed/tokenization/keys/*",
+    "./managed/tokenization/zkir/*": "./dist/managed/tokenization/zkir/*"
   },
   "scripts": {
-    "build": "rm -rf dist && pnpm run compact && tsc --project tsconfig.build.json && cp -r ./src/managed ./dist/managed && cp ./src/bboard.compact ./dist",
-    "compact": "compact compile src/bboard.compact ./src/managed/bboard",
+    "build": "rm -rf dist && pnpm run compact && tsc --project tsconfig.build.json && cp -r ./src/managed ./dist/managed && cp ./src/tokenization.compact ./dist",
+    "compact": "compact compile src/tokenization.compact ./src/managed/tokenization",
     "lint": "eslint src"
   },
   "devDependencies": {

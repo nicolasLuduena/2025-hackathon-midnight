@@ -1,0 +1,99 @@
+
+// This file is part of midnightntwrk/example-counter.
+// Copyright (C) 2025 Midnight Foundation
+// SPDX-License-Identifier: Apache-2.0
+// Licensed under the Apache License, Version 2.0 (the "License");
+// You may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+pragma language_version >= 0.16;
+import CompactStandardLibrary;
+import "./oz-contracts/src/access/Ownable" prefix Ownable_;
+import "./oz-contracts/src/token/ShieldedToken" prefix Shielded_;
+export { CoinInfo, QualifiedCoinInfo, ZswapCoinPublicKey, AssetPublicInfo };
+
+witness secret_key(): Bytes<32>;
+
+struct AssetPublicInfo {
+  kind: Opaque<"string">;
+  description: Opaque<"string">;
+}
+
+struct AssetPrivateInfo {
+  uri: Opaque<"string">;
+}
+
+struct Tokenization {
+  asset: AssetMetadata;
+}
+
+export ledger assetInfo: AssetPublicInfo;
+
+// FIJO
+export ledger expectedCoinType: Bytes<32>;
+
+// ACTUALIZABLE POR ADMIN
+export ledger unitPrice: Uint<32>;
+
+// acumula lo vendido en minted shares
+ledger accumulated: Map<Bytes<32>, QualifiedCoinInfo>;
+
+// se resta cuando se mintea un token
+export ledger availableShares: Uint<32>;
+
+// Tabla de ofertas
+export ledger sells: Map<Bytes<32>, QualifiedCoinInfo>;
+export ledger claimables: Map<Bytes<32>, QualifiedCoinInfo>;
+
+ledger domain_sep: Bytes<32>;
+
+constructor(
+  _owner: ZswapCoinPublicKey,
+  _assetInfo: AssetPublicInfo,
+  _coinType: Bytes<32>,
+  _unitPrice: Uint<32>,
+  _availableShares: Uint<32>,
+  _domain_sep: Bytes<32>
+) {
+  Ownable_initialize(disclose(left<ZswapCoinPublicKey, ContractAddress>(_owner)));
+  assetInfo = disclose(_assetInfo);
+  unitPrice = disclose(_unitPrice);
+  availableShares = disclose(_availableShares);
+  expectedCoinType = disclose(_coinType);
+  domain_sep = disclose(_domain_sep);
+}
+
+export circuit mintShare(amountOfShares: Uint<32>, coin: CoinInfo): [] {
+  const disclosedCoin = disclose(coin);
+  const disclosedShares = disclose(amountOfShares);
+  assert(disclosedShares <= availableShares, "Not enough shares available");
+  assert(coin.color == expectedCoinType, "Not the right asset provided");
+  assert(coin.value == amountOfShares * unitPrice, "Wrong amount sent");
+  receive(disclosedCoin);
+
+  const coinToInsert = accumulated.member(disclosedCoin.color) ?
+    mergeCoinImmediate(accumulated.lookup(disclosedCoin.color), disclosedCoin) :
+    disclosedCoin;
+
+  const own = left<ZswapCoinPublicKey, ContractAddress>(disclose(ownPublicKey()));
+  mintToken(disclose(domain_sep), disclosedShares as Uint<64>, disclose(domain_sep), own);
+  // accumulated.insertCoin(
+  //   disclosedCoin.color,
+  //   coinToInsert,
+  //   right<ZswapCoinPublicKey, ContractAddress>(kernel.self())
+  // );
+
+  return;
+}
+
+export circuit publicKey(sk: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "bboard:pk:"), sk]);
+}
+

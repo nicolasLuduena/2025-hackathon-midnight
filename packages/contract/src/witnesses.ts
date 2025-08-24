@@ -18,7 +18,7 @@
  * as well as the single witness function that accesses it.
  */
 
-import { Ledger } from "./managed/bboard/contract/index.cjs";
+import { Ledger } from "./managed/tokenization/contract/index.cjs";
 import { WitnessContext } from "@midnight-ntwrk/compact-runtime";
 
 /* **********************************************************************
@@ -68,7 +68,7 @@ export const witnesses = {
   localSecretKey: ({
     privateState,
   }: WitnessContext<Ledger, BBoardPrivateState>): [
-    BBoardPrivateState,
-    Uint8Array,
-  ] => [privateState, privateState.secretKey],
+      BBoardPrivateState,
+      Uint8Array,
+    ] => [privateState, privateState.secretKey],
 };
