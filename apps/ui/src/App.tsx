@@ -6,14 +6,16 @@ import { AssetOverview } from "@/components/asset-overview";
 import { TradingInterface } from "@/components/trading-interface";
 import Header from "./components/Header";
 import { useContractContext } from "./hooks/useDeployedContract";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Observable } from "rxjs";
-import type { BoardDeployment } from "./contexts/browser-contract-manager";
+import type { ContractDeployment } from "./contexts/browser-contract-manager";
+import { Button } from "./components/ui/button";
+//import { type ContractAddress } from "@midnight-ntwrk/compact-runtime";
 
 export default function ZKTradingDashboard() {
   const boardApiProvider = useContractContext();
   const [boardDeployments, setBoardDeployments] = useState<
-    Array<Observable<BoardDeployment>>
+    Array<Observable<ContractDeployment>>
   >([]);
 
   useEffect(() => {
@@ -27,11 +29,25 @@ export default function ZKTradingDashboard() {
 
   console.log(boardDeployments);
 
+  //const deployContract = async () => {};
+
+  const onCreateBoard = useCallback(
+    () => boardApiProvider.resolve(),
+    [boardApiProvider],
+  );
+
+  //const onJoinBoard = useCallback(
+  //  (contractAddress: ContractAddress) =>
+  //    boardApiProvider.resolve(contractAddress),
+  //  [boardApiProvider],
+  //);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8 pt-24">
         <div className="grid gap-8">
+          <Button onClick={onCreateBoard}>HOLAAA</Button>
           <section>
             <div className="flex items-center justify-between mb-6">
               <div>
